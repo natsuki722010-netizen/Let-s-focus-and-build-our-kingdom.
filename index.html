@@ -844,12 +844,12 @@
         if (gameState.resources[res] !== undefined) gameState.resources[res] += val;
       });
 
-    saveGameState();
-    renderQuests(); // 画面のボタンを「受取済」に更新
-    updateUI();
-    sound.playChime();
-    showToast('🎁 ミッションの報酬を受け取りました！');
-  };
+      saveGameState();
+      renderQuests(); // 画面のボタンを「受取済」に更新
+      updateUI();
+      sound.playChime();
+      showToast('🎁 ミッションの報酬を受け取りました！');
+    };
       sound.playChime();
       confetti({ particleCount: 50, spread: 50 });
 
