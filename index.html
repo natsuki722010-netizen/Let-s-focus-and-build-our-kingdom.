@@ -817,7 +817,9 @@
       questsToDisplay.forEach(q => {
         const isCompleted = q.current >= q.target;
         const progressPercent = Math.min(100, Math.floor((q.current / q.target) * 100));
-        const rewardText = Object.entries(q.reward).map(([res, val]) => {
+        const rewardText = Object.entries(q.reward)
+          .map(([res, val]) => `${icons[res] || ''}+${val}`)
+          .join(', ');
           const icons = { gold: '🪙', wood: '🪵', stone: '🪨', knowledge: '📚' };
           return `${icons[res] || ''}+${val}`;
 
