@@ -824,8 +824,14 @@
     }
     
       window.claimQuestReward = function(questId, type) {
-    const questList = (type === 'daily') ? gameState.dailyQuests : gameState.regularQuests;
-    const q = questList.find(item => item.id === questId);
+    // typeが指定されていない場合でも、両方のリストから自動で探すようにする安全設計
+    let q = null;
+    if (type === 'daily' || !type) {
+      q = gameState.dailyQuests.find(item => item.id === questId);
+    }
+    if (!q && (type === 'regular' || !type)) {
+      q = gameState.regularQuests.find(item => item.id === questId);
+    }
     
     if (!q || q.current < q.target) return;
 
