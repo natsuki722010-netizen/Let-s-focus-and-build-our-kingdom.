@@ -461,13 +461,7 @@
       { name: "中世の王国", reqKnowledge: 200, title: "威風堂々たる領主", maxPlots: 12 },
       { name: "ルネサンスギルド", reqKnowledge: 600, title: "知識と芸術の庇護者", maxPlots: 16 },
       { name: "産業帝国", reqKnowledge: 1500, title: "蒸気と鋼鉄の皇帝", maxPlots: 20 },
-      { name: "魔法サイバー王国", reqKnowledge: 5000, title: "次元を超える大賢者", maxPlots: 25 },
-      // --- ここから新しい5つの時代 ---
-      { name: "惑星開拓時代", reqKnowledge: 18000, title: "星系を開拓するパイオニア", maxPlots: 30 },
-      { name: "量子ネットワーク文明", reqKnowledge: 56000, title: "全知全能のネットワーク主宰", maxPlots: 36 },
-      { name: "星間帝国", reqKnowledge: 99000, title: "銀河を統べる皇帝", maxPlots: 42 },
-      { name: "次元融合世界", reqKnowledge: 1300000, title: "マルチバースの支配者", maxPlots: 49 },
-      { name: "神話創世の領域", reqKnowledge: 30000000, title: "新たな宇宙の創造主", maxPlots: 56 }
+      { name: "魔法サイバー王国", reqKnowledge: 5000, title: "次元を超える大賢者", maxPlots: 25 }
     ];
 
     const BUILDING_TYPES = [
@@ -477,28 +471,7 @@
       { id: 'quarry', name: '採石場', icon: '⛏️', eraReq: 0, cost: { gold: 50, wood: 50 }, popAdd: 0, desc: '石材を生産。' },
       { id: 'house', name: '煉瓦の家', icon: '🏠', eraReq: 1, cost: { gold: 80, wood: 60, stone: 40 }, popAdd: 5, desc: '快適な住居。' },
       { id: 'library', name: '大図書館', icon: '📚', eraReq: 1, cost: { gold: 120, stone: 80 }, popAdd: 0, desc: '知識を深める学術施設。' },
-      { id: 'castle', name: '城郭タワー', icon: '🏰', eraReq: 1, cost: { gold: 300, stone: 200 }, popAdd: 10, desc: '王国のシンボル。' },
-      // --- ルネサンスギルド以降の建物 ---
-      { id: 'academy', name: 'アカデミー', icon: '🏛️', eraReq: 2, cost: { gold: 500, stone: 300, knowledge: 50 }, popAdd: 15, desc: '芸術と科学が花開く高等施設。' },
-      { id: 'workshop', name: '工房ギルド', icon: '⚙️', eraReq: 2, cost: { gold: 400, wood: 300, stone: 200 }, popAdd: 5, desc: '効率的な資材加工を行う。' },
-      { id: 'factory', name: '蒸気機関工場', icon: '🏭', eraReq: 3, cost: { gold: 1000, wood: 800, stone: 600 }, popAdd: 30, desc: '大量のエネルギーを生み出す。' },
-      { id: 'observatory', name: '天体観測所', icon: '🔭', eraReq: 3, cost: { gold: 1200, stone: 1000, knowledge: 200 }, popAdd: 10, desc: '宇宙の真理を解き明かす。' },
-      { id: 'magictower', name: '魔導クリスタルタワー', icon: '🔮', eraReq: 4, cost: { gold: 3000, stone: 2000, knowledge: 500 }, popAdd: 50, desc: '次元を超えた魔力を供給する。' }
-      // --- 惑星開拓時代 (eraReq: 5) ---
-      { id: 'dome', name: '宇宙バイオドーム', icon: '🌐', eraReq: 5, cost: { gold: 6000, wood: 4000, stone: 4000 }, popAdd: 80, desc: '地球外での居住を可能にする巨大ドーム。' },
-      { id: 'solar', name: '軌道ソーラープラント', icon: '🛰️', eraReq: 5, cost: { gold: 8000, stone: 5000, knowledge: 800 }, popAdd: 0, desc: '宇宙空間から無限のエネルギーを生み出す。' },
-      // --- 量子ネットワーク文明 (eraReq: 6) ---
-      { id: 'quantum_server', name: '量子データコア', icon: '💻', eraReq: 6, cost: { gold: 15000, stone: 10000, knowledge: 2000 }, popAdd: 100, desc: 'すべての知識を光速で処理する中枢。' },
-      { id: 'ai_hub', name: 'AI自律管理プラント', icon: '🤖', eraReq: 6, cost: { gold: 20000, stone: 15000, knowledge: 3000 }, popAdd: 50, desc: '自動で効率よく資源を産出し続ける。' },
-      // --- 星間帝国 (eraReq: 7) ---
-      { id: 'dyson_node', name: 'ダイソン球・中継ノード', icon: '☀️', eraReq: 7, cost: { gold: 45000, stone: 30000, knowledge: 6000 }, popAdd: 200, desc: '恒星のエネルギーを直接利用する。' },
-      { id: 'space_colony', name: '巨大スペースコロニー', icon: '🛸', eraReq: 7, cost: { gold: 60000, wood: 40000, stone: 40000 }, popAdd: 500, desc: '数万人の市民が暮らす天空の都市。' },
-      // --- 次元融合世界 (eraReq: 8) ---
-      { id: 'gate', name: 'マルチバースゲート', icon: '🌌', eraReq: 8, cost: { gold: 120000, stone: 80000, knowledge: 15000 }, popAdd: 1000, desc: '異なる次元と接続し、莫大な富をもたらす。' },
-      { id: 'time_lab', name: '因果律研究所', icon: '⏳', eraReq: 8, cost: { gold: 150000, stone: 100000, knowledge: 25000 }, popAdd: 300, desc: '時間と空間の法則を研究する超科学施設。' },
-      // --- 神話創世の領域 (eraReq: 9) ---
-      { id: 'genesis_engine', name: '創世の神器', icon: '✨', eraReq: 9, cost: { gold: 300000, stone: 200000, knowledge: 50000 }, popAdd: 2500, desc: '新たな世界や生命を形作る究極の装置。' },
-      { id: 'pandora_palace', name: '星霊神殿', icon: '🏛️', eraReq: 9, cost: { gold: 500000, stone: 400000, knowledge: 100000 }, popAdd: 5000, desc: '宇宙の神々が宿る、王国の最終到達点。' }    
+      { id: 'castle', name: '城郭タワー', icon: '🏰', eraReq: 1, cost: { gold: 300, stone: 200 }, popAdd: 10, desc: '王国のシンボル。' }
     ];
 
     class SoundEngine {
@@ -809,55 +782,18 @@
     }
 
     function renderQuests() {
-  const container = document.getElementById('questListContainer');
-  if (!container) return;
+      const container = document.getElementById('questListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      const questsToDisplay = (currentQuestTab === 'daily') ? gameState.dailyQuests : gameState.regularQuests;
 
-  container.innerHTML = '';
-  const questsToDisplay = currentQuestTab === 'daily'
-    ? gameState.dailyQuests
-    : gameState.regularQuests;
-
-  const icons = { gold: '🪙', wood: '🪵', stone: '🪨', knowledge: '📚' };
-
-  questsToDisplay.forEach((q) => {
-    const isCompleted = q.current >= q.target;
-    const progressPercent = Math.min(100, Math.floor((q.current / q.target) * 100));
-    const rewardText = Object.entries(q.reward)
-      .map(([res, val]) => `${icons[res] || ''}+${val}`)
-      .join(', ');
-
-    const card = document.createElement('div');
-    card.className = `p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-      q.claimed ? 'bg-slate-900/40 border-slate-800/60 opacity-60' : 'bg-slate-800/60 border-slate-700'
-    }`;
-
-    card.innerHTML = `
-      <div class="space-y-2 flex-1">
-        <div class="flex items-center gap-2">
-          <span class="font-pixel font-bold text-slate-200 text-sm">${q.title}</span>
-          ${q.level ? `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border px-2 py-0.5 rounded-full font-mono">Lv.${q.level}</span>` : ''}
-        </div>
-        <p class="text-xs text-slate-400">${q.desc}</p>
-        <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
-          <div class="bg-indigo-500 h-full transition-all duration-300" style="width: ${progressPercent}%"></div>
-        </div>
-        <div class="flex justify-between items-center text-[11px] text-slate-400 font-mono">
-          <span>進捗: ${q.current} / ${q.target}</span>
-          <span class="text-amber-400">報酬: ${rewardText}</span>
-        </div>
-      </div>
-      <div>
-        ${isCompleted
-          ? `<button onclick="claimQuestReward('${q.id}', '${currentQuestTab}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg pixel-btn">報酬を受け取る</button>`
-          : `<button disabled class="bg-slate-800/80 text-slate-500 text-xs font-semibold px-4 py-2 rounded-xl">未達成</button>`
-        }
-      </div>
-    `;
-
-    container.appendChild(card);
-  });
-}
-      
+      questsToDisplay.forEach(q => {
+        const isCompleted = q.current >= q.target;
+        const progressPercent = Math.min(100, Math.floor((q.current / q.target) * 100));
+        const rewardText = Object.entries(q.reward).map(([res, val]) => {
+          const icons = { gold: '🪙', wood: '🪵', stone: '🪨', knowledge: '📚' };
+          return `${icons[res] || ''}+${val}`;
+        }).join(' ');
 
         const card = document.createElement('div');
         card.className = `p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 ${q.claimed ? 'bg-slate-900/40 border-slate-800/60 opacity-60' : 'bg-slate-800/60 border-slate-700/60'}`;
