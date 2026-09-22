@@ -823,26 +823,33 @@
       });
     }
 
-    window.claimQuestReward = function(questId, type) {
-      const questList = (type === 'daily') ? gameState.dailyQuests : gameState.regularQuests;
-      const q = questList.find(item => item.id === questId);
+      window.claimQuestReward = function(questId, type) {
+    const questList = (type === 'daily') ? gameState.dailyQuests : gameState.regularQuests;
+    const q = questList.find(item => item.id === questId);
     
-      // 存在しない、または条件未達成なら終了
-      if (!q || q.current < q.target) return;
+    // 存在しない、または条件未達成なら終了
+    if (!q || q.current < q.target) return;
 
-      // ── 【重要】すでに受け取り済みならここでブロックして無限増殖を防ぐ ──
-      if (q.claimed) {
-        showToast('⚠️ このミッションの報酬はすでに受け取り済みです！');
-        return;
-      }
+    // すでに受け取り済みならブロック
+    if (q.claimed) {
+      showToast('⚠️ このミッションの報酬はすでに受け取り済みです！');
+      return;
+    }
 
-      // 報酬を受け取り済みにマークする
-      q.claimed = true;
+    // 受け取り済みにマーク
+    q.claimed = true;
 
-      // 資源の加算
-      Object.entries(q.reward).forEach(([res, val]) => {
-        if (gameState.resources[res] !== undefined) gameState.resources[res] += val;
-      });
+    // 資源の加算
+    Object.entries(q.reward).forEach(([res, val]) => {
+      if (gameState.resources[res] !== undefined) gameState.resources[res] += val;
+    });
+
+    saveGameState();
+    renderQuests();
+    updateUI();
+    sound.playChime();
+    showToast('🎁 ミッションの報酬を受け取りました！');
+  };
 
       saveGameState();
       renderQuests(); // 画面のボタンを「受取済」に更新
