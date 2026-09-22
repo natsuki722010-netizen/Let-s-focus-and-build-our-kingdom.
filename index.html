@@ -865,7 +865,6 @@
         Object.keys(q.reward).forEach(key => { q.reward[key] = Math.round(q.reward[key] * 1.6); });
         q.desc = `累計勉強時間を${q.target}分達成する`;
         showToast(`🏆 レギュラーミッション Lv.${q.level} へ進化！`);
-      }
       saveGameState();
       updateUI();
     };
