@@ -809,47 +809,55 @@
     }
 
     function renderQuests() {
-      const container = document.getElementById('questListContainer');
-      if (!container) return;
-      container.innerHTML = '';
-      const questsToDisplay = (currentQuestTab === 'daily') ? gameState.dailyQuests : gameState.regularQuests;
+  const container = document.getElementById('questListContainer');
+  if (!container) return;
 
-      questsToDisplay.forEach(q => {
-        const isCompleted = q.current >= q.target;
-        const progressPercent = Math.min(100, Math.floor((q.current / q.target) * 100));
-        const rewardText = Object.entries(q.reward)
-          .map(([res, val]) => `${icons[res] || ''}+${val}`)
-          .join(', ');
-          const icons = { gold: '🪙', wood: '🪵', stone: '🪨', knowledge: '📚' };
-          return `${icons[res] || ''}+${val}`;
+  container.innerHTML = '';
+  const questsToDisplay = currentQuestTab === 'daily'
+    ? gameState.dailyQuests
+    : gameState.regularQuests;
 
-        // 累計＆科目別詳細の描画更新
-        const totalMins = gameState.totalStudyMinutes || 0;
-        const hours = Math.floor(totalMins / 60);
-        const mins = totalMins % 60;
-        const totalTimeEl = document.getElementById('detailedTotalStudyTime');
-        if (totalTimeEl) {
-          totalTimeEl.textContent = `${totalMins}分 (${hours}時間${mins}分)`;
+  const icons = { gold: '🪙', wood: '🪵', stone: '🪨', knowledge: '📚' };
+
+  questsToDisplay.forEach((q) => {
+    const isCompleted = q.current >= q.target;
+    const progressPercent = Math.min(100, Math.floor((q.current / q.target) * 100));
+    const rewardText = Object.entries(q.reward)
+      .map(([res, val]) => `${icons[res] || ''}+${val}`)
+      .join(', ');
+
+    const card = document.createElement('div');
+    card.className = `p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+      q.claimed ? 'bg-slate-900/40 border-slate-800/60 opacity-60' : 'bg-slate-800/60 border-slate-700'
+    }`;
+
+    card.innerHTML = `
+      <div class="space-y-2 flex-1">
+        <div class="flex items-center gap-2">
+          <span class="font-pixel font-bold text-slate-200 text-sm">${q.title}</span>
+          ${q.level ? `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border px-2 py-0.5 rounded-full font-mono">Lv.${q.level}</span>` : ''}
+        </div>
+        <p class="text-xs text-slate-400">${q.desc}</p>
+        <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+          <div class="bg-indigo-500 h-full transition-all duration-300" style="width: ${progressPercent}%"></div>
+        </div>
+        <div class="flex justify-between items-center text-[11px] text-slate-400 font-mono">
+          <span>進捗: ${q.current} / ${q.target}</span>
+          <span class="text-amber-400">報酬: ${rewardText}</span>
+        </div>
+      </div>
+      <div>
+        ${isCompleted
+          ? `<button onclick="claimQuestReward('${q.id}', '${currentQuestTab}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg pixel-btn">報酬を受け取る</button>`
+          : `<button disabled class="bg-slate-800/80 text-slate-500 text-xs font-semibold px-4 py-2 rounded-xl">未達成</button>`
         }
+      </div>
+    `;
 
-        const breakdownList = document.getElementById('detailedSubjectBreakdownList');
-        if (breakdownList) {
-          const sm = gameState.subjectMinutes || {};
-          const subjects = gameState.subjects || DEFAULT_SUBJECTS;
-          breakdownList.innerHTML = subjects.map(s => {
-            const m = sm[s.id] || 0;
-            const percent = totalMins > 0 ? ((m / totalMins) * 100).toFixed(1) : 0.0;
-            return `
-              <div class="flex items-center justify-between bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800">
-                <span class="text-slate-200 font-sans font-bold">${s.name}</span>
-                <div class="flex gap-4 text-slate-300">
-                  <span class="text-indigo-300 font-bold">${m}分</span>
-                  <span class="text-slate-400 w-16 text-right">${percent}%</span>
-                </div>
-              </div>
-            `;
-          }).join('');
-        }
+    container.appendChild(card);
+  });
+}
+      
 
         const card = document.createElement('div');
         card.className = `p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 ${q.claimed ? 'bg-slate-900/40 border-slate-800/60 opacity-60' : 'bg-slate-800/60 border-slate-700/60'}`;
