@@ -823,7 +823,10 @@
       });
     }
     
-      window.claimQuestReward = function(questId, type) {
+      window.claimQuestReward = function(questId, type)
+      const canvas = document.getElementById('kingdomCanvas');
+const ctx = canvas.getContext('2d');
+let selectedPlotBuilding = null;　{
     // typeが指定されていない場合でも、両方のリストから自動で探すようにする安全設計
     let q = null;
     if (type === 'daily' || !type) {
@@ -873,10 +876,6 @@
       saveGameState();
       updateUI();
     };
-
-    const canvas = document.getElementById('kingdomCanvas');
-    const ctx = canvas.getContext('2d');
-    let selectedPlotBuilding = null;
 
     function renderCanvasMap() {
       if (!canvas) return;
