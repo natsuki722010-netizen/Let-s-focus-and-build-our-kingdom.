@@ -825,41 +825,41 @@
     
       window.claimQuestReward = function(questId, type)
       // ==========================================
-// 1. 変数の初期化（一番上に配置して参照エラーを防止）
-// ==========================================
-const canvas = document.getElementById('kingdomCanvas')
-const ctx = canvas ? canvas.getContext('2d') : null;
-let selectedPlotBuilding = null;
+      // 1. 変数の初期化（一番上に配置して参照エラーを防止）
+      // ==========================================
+        const canvas = document.getElementById('kingdomCanvas')
+        const ctx = canvas ? canvas.getContext('2d') : null;
+    let selectedPlotBuilding = null;
 
-// ==========================================
-// 2. マップ描画関数
-// ==========================================
-function renderCanvasMap() {
-  if (!canvas) return;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-  // 以下、マップ描画の処理が続きます
-}
+    // ==========================================
+    // 2. マップ描画関数
+    // ==========================================
+    function renderCanvasMap() {
+      if (!canvas) return;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      // 以下、マップ描画の処理が続きます
+    }
 
-// ==========================================
-// 3. ミッション報酬受け取り関数（安全設計版）
-// ==========================================
-window.claimQuestReward = function(questId, type) {
-  let q = null;
-  if (type === 'daily' || !type) {
-    q = gameState.dailyQuests.find(item => item.id === questId);
-  }
-  if (!q && (type === 'regular' || !type)) {
-    q = gameState.regularQuests.find(item => item.id === questId);
-  }
+    // ==========================================
+    // 3. ミッション報酬受け取り関数（安全設計版）
+    // ==========================================
+    window.claimQuestReward = function(questId, type) {
+      let q = null;
+      if (type === 'daily' || !type) {
+        q = gameState.dailyQuests.find(item => item.id === questId);
+      }
+      if (!q && (type === 'regular' || !type)) {
+        q = gameState.regularQuests.find(item => item.id === questId);
+      }
   
-  if (!q || q.current < q.target) return;
+      if (!q || q.current < q.target) return;
 
-  if (q.claimed) {
-    showToast('⚠️ このミッションの報酬はすでに受け取り済みです！');
-    return;
-  }
+      if (q.claimed) {
+        showToast('⚠️ このミッションの報酬はすでに受け取り済みです！');
+        return;
+      }}
 
   q.claimed = true;
 
