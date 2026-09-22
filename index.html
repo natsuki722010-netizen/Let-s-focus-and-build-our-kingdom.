@@ -824,24 +824,63 @@
     }
     
       window.claimQuestReward = function(questId, type)
-      const canvas = document.getElementById('kingdomCanvas');
-const ctx = canvas.getContext('2d');
-let selectedPlotBuilding = null;　{
-    // typeが指定されていない場合でも、両方のリストから自動で探すようにする安全設計
-    let q = null;
-    if (type === 'daily' || !type) {
-      q = gameState.dailyQuests.find(item => item.id === questId);
-    }
-    if (!q && (type === 'regular' || !type)) {
-      q = gameState.regularQuests.find(item => item.id === questId);
-    }
-    
-    if (!q || q.current < q.target) return;
+      // ==========================================
+// 1. 変数の初期化（一番上に配置して参照エラーを防止）
+// ==========================================
+const canvas = document.getElementById('kingdomCanvas');
+const ctx = canvas ? canvas.getContext('2d') : null;
+let selectedPlotBuilding = null;
 
-    if (q.claimed) {
-      showToast('⚠️ このミッションの報酬はすでに受け取り済みです！');
-      return;
-    }
+// ==========================================
+// 2. マップ描画関数
+// ==========================================
+function renderCanvasMap() {
+  if (!canvas) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  // 以下、マップ描画の処理が続きます
+}
+
+// ==========================================
+// 3. ミッション報酬受け取り関数（安全設計版）
+// ==========================================
+window.claimQuestReward = function(questId, type) {
+  let q = null;
+  if (type === 'daily' || !type) {
+    q = gameState.dailyQuests.find(item => item.id === questId);
+  }
+  if (!q && (type === 'regular' || !type)) {
+    q = gameState.regularQuests.find(item => item.id === questId);
+  }
+  
+  if (!q || q.current < q.target) return;
+
+  if (q.claimed) {
+    showToast('⚠️ このミッションの報酬はすでに受け取り済みです！');
+    return;
+  }
+
+  q.claimed = true;
+
+  Object.entries(q.reward).forEach(([res, val]) => {
+    if (gameState.resources[res] !== undefined) gameState.resources[res] += val;
+  });
+
+  saveGameState();
+  renderQuests();
+  updateUI();
+  sound.playChime();
+  showToast('🎁 ミッションの報酬を受け取りました！');
+};
+
+// ==========================================
+// 4. 初期化・UI更新の呼び出し（一番最後に配置）
+// ==========================================
+// 例: ページの読み込み時やセットアップの最後に実行
+if (typeof updateUI === 'function') {
+  updateUI();
+}
 
     q.claimed = true;
 
