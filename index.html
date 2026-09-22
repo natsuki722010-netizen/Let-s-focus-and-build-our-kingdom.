@@ -821,7 +821,8 @@
         `;
         container.appendChild(card);
       });
-
+    }
+    
       window.claimQuestReward = function(questId, type) {
     const questList = (type === 'daily') ? gameState.dailyQuests : gameState.regularQuests;
     const q = questList.find(item => item.id === questId);
@@ -851,7 +852,6 @@
       updateUI();
       sound.playChime();
       showToast('🎁 ミッションの報酬を受け取りました！');
-    };
       sound.playChime();
       confetti({ particleCount: 50, spread: 50 });
 
