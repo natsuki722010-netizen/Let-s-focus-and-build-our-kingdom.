@@ -1,2 +1,2 @@
-# focus-building-the-kingdom
+# let's-focus-building-the-kingdom
 Focus to build your own kingdom
