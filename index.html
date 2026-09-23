@@ -182,9 +182,10 @@
         </div>
 
         <div class="lg:col-span-5 space-y-6">
-          <div class="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/20 rounded-2xl p-5 shadow-lg">
-            <h2 class="font-pixel text-amber-400 text-base mb-3 flex items-center gap-2">
-              <span>🏰</span> 王国状況
+          <div class="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/20 rounded-2xl p-5 shadow-lg space-y-4">
+            <h2 class="font-pixel text-amber-400 text-base flex items-center justify-between">
+              <span>🏰 王国状況</span>
+              <span id="currentRateBadge" class="text-[11px] font-mono bg-amber-500/10 text-amber-300 px-2.5 py-1 rounded-lg border border-amber-500/30">1分あたりの生産力確認中...</span>
             </h2>
             <div class="grid grid-cols-2 gap-3 text-xs">
               <div class="bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/50">
@@ -416,7 +417,7 @@
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <script>
-    const STORAGE_KEY = 'study_kingdom_save_v8';
+    const STORAGE_KEY = 'study_kingdom_save_v10';
 
     const DEFAULT_DAILY_QUESTS = [
       { id: 'd1', title: '本日の集中力トレーニング', desc: '本日中に合計25分間勉強する', target: 25, current: 0, reward: { gold: 30, wood: 30 }, claimed: false, type: 'dailyStudyMinutes' },
@@ -457,7 +458,6 @@
       dailyTrend: {} 
     };
 
-    // ご要望に合わせた全20ステージ（追加13ステージ ＆ 最後の5ステージは鬼畜・無理ゲー）
     const ERAS = [
       { name: "原始の集落", reqKnowledge: 50, title: "小さな集落の指導者", maxPlots: 9 },
       { name: "中世の王国", reqKnowledge: 200, title: "威風堂々たる領主", maxPlots: 12 },
@@ -474,32 +474,30 @@
       { name: "エーテル神界", reqKnowledge: 1000000, title: "霊素の神君", maxPlots: 56 },
       { name: "無の世界・虚無界", reqKnowledge: 2200000, title: "ゼロの化身", maxPlots: 60 },
       { name: "終焉のカタストロフィ", reqKnowledge: 5000000, title: "終わりの始まりの主", maxPlots: 64 },
-      // --- ここからの最後の5ステージは狂気の「無理ゲー」難易度 ---
-      { name: "絶対零度の星雲", reqKnowledge: 15000000, title: "氷結の独裁者", maxPlots: 70 },
-      { name: "エントロピーの荒野", reqKnowledge: 45000000, title: "混沌の破壊神", maxPlots: 76 },
-      { name: "無限地獄プラズマ要塞", reqKnowledge: 150000000, title: "超新星の暴君", maxPlots: 82 },
-      { name: "神殺しの虚空回廊", reqKnowledge: 500000000, title: "神をも凌駕する孤高の亡霊", maxPlots: 88 },
-      { name: "全宇宙崩壊シングラリティ", reqKnowledge: 2000000000, title: "無窮を統べる真の全能神", maxPlots: 100 }
+      { name: "【無理ゲー】絶対零度の星雲", reqKnowledge: 15000000, title: "氷結の独裁者", maxPlots: 70 },
+      { name: "【無理ゲー】エントロピーの荒野", reqKnowledge: 45000000, title: "混沌の破壊神", maxPlots: 76 },
+      { name: "【無理ゲー】無限地獄プラズマ要塞", reqKnowledge: 150000000, title: "超新星の暴君", maxPlots: 82 },
+      { name: "【無理ゲー】神殺しの虚空回廊", reqKnowledge: 500000000, title: "神をも凌駕する孤高の亡霊", maxPlots: 88 },
+      { name: "【無理ゲー】全宇宙崩壊シングラリティ", reqKnowledge: 2000000000, title: "無窮を統べる真の全能神", maxPlots: 100 }
     ];
 
-    // ステージ拡張に伴う新・究極建築の追加
     const BUILDING_TYPES = [
-      { id: 'tent', name: '藁のテント', icon: '⛺', eraReq: 0, cost: { gold: 20, wood: 30 }, popAdd: 2, desc: '住民の住処。人口増加。' },
-      { id: 'farm', name: '農園', icon: '🌾', eraReq: 0, cost: { gold: 30, wood: 40 }, popAdd: 0, desc: 'ゴールドを定期生産。' },
-      { id: 'lumber', name: '伐木所', icon: '🪓', eraReq: 0, cost: { gold: 40, stone: 20 }, popAdd: 0, desc: '木材を生産。' },
-      { id: 'quarry', name: '採石場', icon: '⛏️', eraReq: 0, cost: { gold: 50, wood: 50 }, popAdd: 0, desc: '石材を生産。' },
-      { id: 'house', name: '煉瓦の家', icon: '🏠', eraReq: 1, cost: { gold: 80, wood: 60, stone: 40 }, popAdd: 5, desc: '快適な住居。' },
-      { id: 'library', name: '大図書館', icon: '📚', eraReq: 1, cost: { gold: 120, stone: 80 }, popAdd: 0, desc: '知識を深める学術施設。' },
-      { id: 'castle', name: '城郭タワー', icon: '🏰', eraReq: 1, cost: { gold: 300, stone: 200 }, popAdd: 10, desc: '王国のシンボル。' },
-      { id: 'factory', name: '蒸気工場', icon: '🏭', eraReq: 3, cost: { gold: 500, stone: 300 }, popAdd: 15, desc: '産業革命の象徴。' },
-      { id: 'academy', name: '魔導アカデミー', icon: '🔮', eraReq: 4, cost: { gold: 1000, stone: 600, knowledge: 200 }, popAdd: 25, desc: '魔法とサイバーの融合施設。' },
-      { id: 'ufo', name: 'スタードック', icon: '🛸', eraReq: 5, cost: { gold: 2500, wood: 1500, stone: 1500 }, popAdd: 50, desc: '星間飛行船を格納するドック。' },
-      { id: 'quantum_lab', name: '量子位相ドーム', icon: '⚛️', eraReq: 6, cost: { gold: 5000, stone: 3000, knowledge: 1000 }, popAdd: 80, desc: '多次元の確率を制御する最先端ドーム。' },
-      { id: 'dark_tower', name: 'ダークマター炉', icon: '🌑', eraReq: 7, cost: { gold: 12000, stone: 8000, knowledge: 3000 }, popAdd: 130, desc: '暗黒物質から無限のエネルギーを生む要塞。' },
-      { id: 'time_gate', name: '時空改変ゲート', icon: '⏳', eraReq: 8, cost: { gold: 30000, stone: 20000, knowledge: 8000 }, popAdd: 200, desc: '過去と未来を繋ぐ禁断の門。' },
-      { id: 'divine_spire', name: '天界の尖塔', icon: '🗼', eraReq: 9, cost: { gold: 80000, stone: 50000, knowledge: 20000 }, popAdd: 350, desc: '神々の領域へと届く天上の尖塔。' },
-      { id: 'string_engine', name: '超弦炉心エンジン', icon: '🌌', eraReq: 11, cost: { gold: 300000, stone: 200000, knowledge: 80000 }, popAdd: 600, desc: '宇宙の基本振動を司る究極の炉心。' },
-      { id: 'singularity_core', name: '特異点神殿', icon: '🌀', eraReq: 15, cost: { gold: 2000000, wood: 1000000, stone: 1500000, knowledge: 500000 }, popAdd: 1500, desc: '無理ゲー時代の果てにそびえ立つ全知全能の神殿。' }
+      { id: 'tent', name: '藁のテント', icon: '⛺', eraReq: 0, cost: { gold: 20, wood: 30 }, popAdd: 2, bonus: { gold: 0.5, knowledge: 0.2 }, desc: '住民の住処。人口とわずかな資源。' },
+      { id: 'farm', name: '農園', icon: '🌾', eraReq: 0, cost: { gold: 30, wood: 40 }, popAdd: 0, bonus: { gold: 2.5, wood: 0.5 }, desc: 'ゴールドを多く生産する。' },
+      { id: 'lumber', name: '伐木所', icon: '🪓', eraReq: 0, cost: { gold: 40, stone: 20 }, popAdd: 0, bonus: { wood: 2.5, stone: 0.5 }, desc: '木材を多く生産する。' },
+      { id: 'quarry', name: '採石場', icon: '⛏️', eraReq: 0, cost: { gold: 50, wood: 50 }, popAdd: 0, bonus: { stone: 2.5, gold: 0.5 }, desc: '石材を多く生産する。' },
+      { id: 'house', name: '煉瓦の家', icon: '🏠', eraReq: 1, cost: { gold: 80, wood: 60, stone: 40 }, popAdd: 5, bonus: { gold: 1.5, stone: 1.5 }, desc: '快適な住居。各種バランスよく生産。' },
+      { id: 'library', name: '大図書館', icon: '📚', eraReq: 1, cost: { gold: 120, stone: 80 }, popAdd: 0, bonus: { knowledge: 3.5, gold: 1.5 }, desc: '知識を深く生み出す学術施設。' },
+      { id: 'castle', name: '城郭タワー', icon: '🏰', eraReq: 1, cost: { gold: 300, stone: 200 }, popAdd: 10, bonus: { gold: 4.0, wood: 3.0, stone: 3.0 }, desc: '王国のシンボル。総合力アップ。' },
+      { id: 'factory', name: '蒸気工場', icon: '🏭', eraReq: 3, cost: { gold: 500, stone: 300 }, popAdd: 15, bonus: { wood: 5.0, stone: 5.0 }, desc: '産業革命の象徴。資材生産特化。' },
+      { id: 'academy', name: '魔導アカデミー', icon: '🔮', eraReq: 4, cost: { gold: 1000, stone: 600, knowledge: 200 }, popAdd: 25, bonus: { knowledge: 7.0, gold: 5.0 }, desc: '魔法とサイバーの融合施設。' },
+      { id: 'ufo', name: 'スタードック', icon: '🛸', eraReq: 5, cost: { gold: 2500, wood: 1500, stone: 1500 }, popAdd: 50, bonus: { gold: 12.0, knowledge: 6.0 }, desc: '星間飛行船を格納するドック。' },
+      { id: 'quantum_lab', name: '量子位相ドーム', icon: '⚛️', eraReq: 6, cost: { gold: 5000, stone: 3000, knowledge: 1000 }, popAdd: 80, bonus: { knowledge: 18.0, stone: 12.0 }, desc: '多次元の確率を制御するドーム。' },
+      { id: 'dark_tower', name: 'ダークマター炉', icon: '🌑', eraReq: 7, cost: { gold: 12000, stone: 8000, knowledge: 3000 }, popAdd: 130, bonus: { gold: 35.0, wood: 25.0, stone: 25.0 }, desc: '暗黒物質から膨大なエネルギーを生む。' },
+      { id: 'time_gate', name: '時空改変ゲート', icon: '⏳', eraReq: 8, cost: { gold: 30000, stone: 20000, knowledge: 8000 }, popAdd: 200, bonus: { knowledge: 45.0, gold: 30.0 }, desc: '過去と未来を繋ぎ効率を加速。' },
+      { id: 'divine_spire', name: '天界の尖塔', icon: '🗼', eraReq: 9, cost: { gold: 80000, stone: 50000, knowledge: 20000 }, popAdd: 350, bonus: { gold: 90.0, stone: 60.0, knowledge: 60.0 }, desc: '神々の領域へと届く尖塔。' },
+      { id: 'string_engine', name: '超弦炉心エンジン', icon: '🌌', eraReq: 11, cost: { gold: 300000, stone: 200000, knowledge: 80000 }, popAdd: 600, bonus: { gold: 300.0, knowledge: 250.0 }, desc: '宇宙の基本振動を司る炉心。' },
+      { id: 'singularity_core', name: '【無理ゲー要塞】特異点神殿', icon: '🌀', eraReq: 15, cost: { gold: 2000000, wood: 1000000, stone: 1500000, knowledge: 500000 }, popAdd: 1500, bonus: { gold: 1500.0, wood: 1500.0, stone: 1500.0, knowledge: 1500.0 }, desc: '全知全能の神殿。' }
     ];
 
     class SoundEngine {
@@ -597,6 +595,25 @@
       updateUI();
     }
 
+    // 1分あたりの獲得レート計算（基礎値 + 建物ごとのレベル倍率ボーナス）
+    function calculateRewardRates() {
+      let rate = { gold: 2, wood: 2, stone: 1.5, knowledge: 1.0 };
+
+      if (gameState.buildings && gameState.buildings.length > 0) {
+        gameState.buildings.forEach(b => {
+          const type = BUILDING_TYPES.find(t => t.id === b.typeId);
+          if (type && type.bonus) {
+            const lvl = b.level || 1;
+            if (type.bonus.gold) rate.gold += type.bonus.gold * lvl;
+            if (type.bonus.wood) rate.wood += type.bonus.wood * lvl;
+            if (type.bonus.stone) rate.stone += type.bonus.stone * lvl;
+            if (type.bonus.knowledge) rate.knowledge += type.bonus.knowledge * lvl;
+          }
+        });
+      }
+      return rate;
+    }
+
     function updateClockDisplay() {
       const display = document.getElementById('timeDisplay');
       const ring = document.getElementById('timerProgressRing');
@@ -627,10 +644,11 @@
       if (activeTimerMode === 'stopwatch') mins = Math.max(1, Math.floor(stopwatchSeconds / 60));
       if (activeTimerMode === 'pomodoro') mins = (pomoState === 'work') ? 25 : 0;
 
-      const gold = Math.round(mins * 2);
-      const wood = Math.round(mins * 2);
-      const stone = Math.round(mins * 1.5);
-      const know = Math.round(mins * 1.0);
+      const rates = calculateRewardRates();
+      const gold = Math.round(mins * rates.gold);
+      const wood = Math.round(mins * rates.wood);
+      const stone = Math.round(mins * rates.stone);
+      const know = Math.round(mins * rates.knowledge);
 
       document.getElementById('rewardPreview').textContent = `予想獲得: 🪙+${gold} 🪵+${wood} 🪨+${stone} 📚+${know}`;
     }
@@ -748,10 +766,11 @@
       if (minutes <= 0) return;
       const subjId = document.getElementById('subjectSelect').value;
 
-      const goldGain = Math.round(minutes * 2);
-      const woodGain = Math.round(minutes * 2);
-      const stoneGain = Math.round(minutes * 1.5);
-      const knowGain = Math.round(minutes * 1.0);
+      const rates = calculateRewardRates();
+      const goldGain = Math.round(minutes * rates.gold);
+      const woodGain = Math.round(minutes * rates.wood);
+      const stoneGain = Math.round(minutes * rates.stone);
+      const knowGain = Math.round(minutes * rates.knowledge);
 
       gameState.resources.gold += goldGain;
       gameState.resources.wood += woodGain;
@@ -1084,6 +1103,10 @@
       document.getElementById('eraBadge').textContent = currentEra.name;
       document.getElementById('kingdomTitle').textContent = currentEra.title;
 
+      // 現在の1分あたりの獲得レート表示を更新
+      const rates = calculateRewardRates();
+      document.getElementById('currentRateBadge').textContent = `1分当り 🪙+${rates.gold} 🪵+${rates.wood} 🪨+${rates.stone} 📚+${rates.knowledge}`;
+
       document.getElementById('statTotalStudyHours').textContent = `${gameState.totalStudyMinutes}分`;
       document.getElementById('statStreakDays').textContent = `${gameState.streakDays}日`;
       document.getElementById('statTotalBuildings').textContent = `${gameState.buildings.length}棟`;
@@ -1117,6 +1140,12 @@
         if (b.cost.stone) costStr += `🪨${b.cost.stone} `;
         if (b.cost.knowledge) costStr += `📚${b.cost.knowledge} `;
 
+        let bonusStr = '';
+        if (b.bonus.gold) bonusStr += `🪙+${b.bonus.gold}/分 `;
+        if (b.bonus.wood) bonusStr += `🪵+${b.bonus.wood}/分 `;
+        if (b.bonus.stone) bonusStr += `🪨+${b.bonus.stone}/分 `;
+        if (b.bonus.knowledge) bonusStr += `📚+${b.bonus.knowledge}/分 `;
+
         card.innerHTML = `
           <div>
             <div class="flex items-center justify-between mb-2">
@@ -1125,6 +1154,7 @@
             </div>
             <h4 class="font-pixel text-slate-100 text-sm font-bold">${b.name}</h4>
             <p class="text-xs text-slate-400 mt-1">${b.desc}</p>
+            <p class="text-[11px] text-emerald-400 mt-2 font-mono bg-emerald-950/30 px-2 py-1 rounded border border-emerald-900/40">上昇効果: ${bonusStr}</p>
           </div>
           <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center">
             <span class="text-[11px] font-mono text-amber-400">${costStr}</span>
@@ -1375,7 +1405,18 @@
           document.getElementById('bldgModalIcon').textContent = type.icon;
           document.getElementById('bldgModalName').textContent = `${type.name} (Lv.${bldg.level || 1})`;
           document.getElementById('bldgModalDesc').textContent = type.desc;
-          document.getElementById('bldgModalStats').innerHTML = `<div>配置位置: 区画 #${bldg.plotIndex + 1}</div>`;
+          
+          let bBonusStr = '';
+          const lvl = bldg.level || 1;
+          if (type.bonus.gold) bBonusStr += `🪙+${type.bonus.gold * lvl}/分 `;
+          if (type.bonus.wood) bBonusStr += `🪵+${type.bonus.wood * lvl}/分 `;
+          if (type.bonus.stone) bBonusStr += `🪨+${type.bonus.stone * lvl}/分 `;
+          if (type.bonus.knowledge) bBonusStr += `📚+${type.bonus.knowledge * lvl}/分 `;
+
+          document.getElementById('bldgModalStats').innerHTML = `
+            <div>配置位置: 区画 #${bldg.plotIndex + 1}</div>
+            <div class="text-emerald-400 mt-1">生産ボーナス: ${bBonusStr}</div>
+          `;
           document.getElementById('modalBuildingDetail').classList.remove('hidden');
         }
       });
@@ -1400,7 +1441,7 @@
 
       document.getElementById('btnDemolishBuilding').addEventListener('click', () => {
         if (!selectedPlotBuilding) return;
-        gameState.buildings = gameState.buildings.filter(b => b.id !== selectedPlotBuilding.id);
+        gameState.buildings = gameState.buildings.buildings = gameState.buildings.filter(b => b.id !== selectedPlotBuilding.id);
         showToast('💥 建物を撤去しました');
         document.getElementById('modalBuildingDetail').classList.add('hidden');
         saveGameState();
