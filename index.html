@@ -121,7 +121,7 @@
           </div>
 
           <div class="mb-4 max-w-sm mx-auto">
-            <label class="block text-xs font-semibold text-slate-400 mb-2 text-center">学習科目（カスタム設定可能）</label>
+            <label class="block text-xs font-semibold text-slate-400 mb-2 text-center">学習科目</label>
             <select id="subjectSelect" class="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-xl px-4 py-2.5 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <!-- 動的生成 -->
             </select>
@@ -281,9 +281,16 @@
     <!-- TAB 5: STATS -->
     <section id="tab-stats" class="tab-content hidden">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-12 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+          <h3 class="font-pixel text-amber-400 text-sm flex items-center gap-2">
+            ⏱️ 学習時間サマリー（累計 ＆ 各教科ごとの合計）
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="subjectSummaryCards"></div>
+        </div>
+
         <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
           <h3 class="font-pixel text-slate-200 text-sm flex items-center gap-2">
-            📊 日別 学習時間推移（棒グラフ ＋ 折れ線グラフ）
+            📊 日別 学習時間推移
           </h3>
           <div class="relative h-64 w-full">
             <canvas id="statsDailyChart"></canvas>
@@ -292,7 +299,7 @@
 
         <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4 flex flex-col">
           <h3 class="font-pixel text-slate-200 text-sm flex items-center gap-2">
-            🥧 科目別 学習割合（円グラフ）
+            🥧 科目別 学習割合
           </h3>
           <div class="relative h-64 w-full flex-1 flex items-center justify-center">
             <canvas id="statsSubjectChart"></canvas>
@@ -311,12 +318,11 @@
     <!-- TAB 6: SETTINGS & SUBJECTS -->
     <section id="tab-settings" class="tab-content hidden">
       <div class="max-w-2xl mx-auto space-y-6">
-        <!-- 週間目標の設定 -->
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
           <h3 class="font-pixel text-amber-400 text-base flex items-center gap-2 border-b border-slate-800 pb-3">
             🎯 目標学習時間の設定
           </h3>
-          <p class="text-xs text-slate-400">1日あたりの平均目標学習時間を設定します。この目標を基に週1回の魔物襲来イベントが判定されます。</p>
+          <p class="text-xs text-slate-400">1日あたりの平均目標学習時間を設定します。</p>
           <div class="flex items-center gap-3">
             <input type="number" id="inputTargetDailyMinutes" min="5" max="300" value="30" class="w-28 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-xs font-mono font-bold text-amber-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <span class="text-xs text-slate-300 font-bold">分 / 日（平均）</span>
@@ -328,13 +334,10 @@
           <h3 class="font-pixel text-amber-400 text-base flex items-center gap-2 border-b border-slate-800 pb-3">
             📚 学習科目のカスタマイズ
           </h3>
-          <p class="text-xs text-slate-400">自分で好きな科目名を追加したり不要な科目を削除できます。</p>
-          
           <div class="flex gap-2">
             <input type="text" id="inputNewSubjectName" placeholder="新しい科目名（例: 物理、古文など）" class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <button id="btnAddSubject" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-2 rounded-xl">➕ 追加</button>
           </div>
-
           <div id="customSubjectList" class="space-y-2 max-h-48 overflow-y-auto"></div>
         </div>
 
@@ -342,7 +345,6 @@
           <h3 class="font-pixel text-amber-400 text-base flex items-center gap-2 border-b border-slate-800 pb-3">
             ⚙️ セーブデータ管理 & 音響設定
           </h3>
-
           <div class="space-y-3">
             <h4 class="text-xs font-bold text-slate-300">音響設定</h4>
             <div class="flex items-center justify-between bg-slate-800/50 p-3 rounded-xl">
@@ -350,7 +352,6 @@
               <input type="checkbox" id="cfgSoundSE" checked class="w-4 h-4 accent-indigo-500 cursor-pointer">
             </div>
           </div>
-
           <div class="space-y-3 border-t border-slate-800 pt-4">
             <h4 class="text-xs font-bold text-slate-300">セーブデータ管理</h4>
             <div class="flex flex-wrap gap-2 pt-2">
@@ -415,7 +416,7 @@
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <script>
-    const STORAGE_KEY = 'study_kingdom_save_v6';
+    const STORAGE_KEY = 'study_kingdom_save_v8';
 
     const DEFAULT_DAILY_QUESTS = [
       { id: 'd1', title: '本日の集中力トレーニング', desc: '本日中に合計25分間勉強する', target: 25, current: 0, reward: { gold: 30, wood: 30 }, claimed: false, type: 'dailyStudyMinutes' },
@@ -444,7 +445,7 @@
       dailyPomoSets: 0,
       lastDailyResetDate: new Date().toDateString(),
       lastWeekCheckDate: new Date().toDateString(),
-      targetDailyMinutes: 30, // ユーザー設定可能な1日平均目標
+      targetDailyMinutes: 30,
       streakDays: 1,
       pomoSetsCompleted: 0,
       buildings: [],
@@ -456,14 +457,32 @@
       dailyTrend: {} 
     };
 
+    // ご要望に合わせた全20ステージ（追加13ステージ ＆ 最後の5ステージは鬼畜・無理ゲー）
     const ERAS = [
       { name: "原始の集落", reqKnowledge: 50, title: "小さな集落の指導者", maxPlots: 9 },
       { name: "中世の王国", reqKnowledge: 200, title: "威風堂々たる領主", maxPlots: 12 },
       { name: "ルネサンスギルド", reqKnowledge: 600, title: "知識と芸術の庇護者", maxPlots: 16 },
       { name: "産業帝国", reqKnowledge: 1500, title: "蒸気と鋼鉄の皇帝", maxPlots: 20 },
-      { name: "魔法サイバー王国", reqKnowledge: 5000, title: "次元を超える大賢者", maxPlots: 25 }
+      { name: "魔法サイバー王国", reqKnowledge: 3500, title: "次元を超える大賢者", maxPlots: 24 },
+      { name: "星間宇宙帝国", reqKnowledge: 7500, title: "銀河を統べる星の覇者", maxPlots: 28 },
+      { name: "量子多次元文明", reqKnowledge: 15000, title: "確率の海を遊泳する者", maxPlots: 32 },
+      { name: "暗黒物質要塞", reqKnowledge: 30000, title: "重力を束ねる覇王", maxPlots: 36 },
+      { name: "時空改変ギルド", reqKnowledge: 60000, title: "歴史の糸を紡ぐ者", maxPlots: 40 },
+      { name: "天界神殿・下層", reqKnowledge: 120000, title: "神域の門番", maxPlots: 44 },
+      { name: "星屑の深淵", reqKnowledge: 250000, title: "宇宙の塵の統治者", maxPlots: 48 },
+      { name: "超弦理論マトリックス", reqKnowledge: 500000, title: "11次元の設計者", maxPlots: 52 },
+      { name: "エーテル神界", reqKnowledge: 1000000, title: "霊素の神君", maxPlots: 56 },
+      { name: "無の世界・虚無界", reqKnowledge: 2200000, title: "ゼロの化身", maxPlots: 60 },
+      { name: "終焉のカタストロフィ", reqKnowledge: 5000000, title: "終わりの始まりの主", maxPlots: 64 },
+      // --- ここからの最後の5ステージは狂気の「無理ゲー」難易度 ---
+      { name: "【無理ゲー】絶対零度の星雲", reqKnowledge: 15000000, title: "氷結の独裁者", maxPlots: 70 },
+      { name: "【無理ゲー】エントロピーの荒野", reqKnowledge: 45000000, title: "混沌の破壊神", maxPlots: 76 },
+      { name: "【無理ゲー】無限地獄プラズマ要塞", reqKnowledge: 150000000, title: "超新星の暴君", maxPlots: 82 },
+      { name: "【無理ゲー】神殺しの虚空回廊", reqKnowledge: 500000000, title: "神をも凌駕する孤高の亡霊", maxPlots: 88 },
+      { name: "【無理ゲー】全宇宙崩壊シングラリティ", reqKnowledge: 2000000000, title: "無窮を統べる真の全能神", maxPlots: 100 }
     ];
 
+    // ステージ拡張に伴う新・究極建築の追加
     const BUILDING_TYPES = [
       { id: 'tent', name: '藁のテント', icon: '⛺', eraReq: 0, cost: { gold: 20, wood: 30 }, popAdd: 2, desc: '住民の住処。人口増加。' },
       { id: 'farm', name: '農園', icon: '🌾', eraReq: 0, cost: { gold: 30, wood: 40 }, popAdd: 0, desc: 'ゴールドを定期生産。' },
@@ -471,7 +490,16 @@
       { id: 'quarry', name: '採石場', icon: '⛏️', eraReq: 0, cost: { gold: 50, wood: 50 }, popAdd: 0, desc: '石材を生産。' },
       { id: 'house', name: '煉瓦の家', icon: '🏠', eraReq: 1, cost: { gold: 80, wood: 60, stone: 40 }, popAdd: 5, desc: '快適な住居。' },
       { id: 'library', name: '大図書館', icon: '📚', eraReq: 1, cost: { gold: 120, stone: 80 }, popAdd: 0, desc: '知識を深める学術施設。' },
-      { id: 'castle', name: '城郭タワー', icon: '🏰', eraReq: 1, cost: { gold: 300, stone: 200 }, popAdd: 10, desc: '王国のシンボル。' }
+      { id: 'castle', name: '城郭タワー', icon: '🏰', eraReq: 1, cost: { gold: 300, stone: 200 }, popAdd: 10, desc: '王国のシンボル。' },
+      { id: 'factory', name: '蒸気工場', icon: '🏭', eraReq: 3, cost: { gold: 500, stone: 300 }, popAdd: 15, desc: '産業革命の象徴。' },
+      { id: 'academy', name: '魔導アカデミー', icon: '🔮', eraReq: 4, cost: { gold: 1000, stone: 600, knowledge: 200 }, popAdd: 25, desc: '魔法とサイバーの融合施設。' },
+      { id: 'ufo', name: 'スタードック', icon: '🛸', eraReq: 5, cost: { gold: 2500, wood: 1500, stone: 1500 }, popAdd: 50, desc: '星間飛行船を格納するドック。' },
+      { id: 'quantum_lab', name: '量子位相ドーム', icon: '⚛️', eraReq: 6, cost: { gold: 5000, stone: 3000, knowledge: 1000 }, popAdd: 80, desc: '多次元の確率を制御する最先端ドーム。' },
+      { id: 'dark_tower', name: 'ダークマター炉', icon: '🌑', eraReq: 7, cost: { gold: 12000, stone: 8000, knowledge: 3000 }, popAdd: 130, desc: '暗黒物質から無限のエネルギーを生む要塞。' },
+      { id: 'time_gate', name: '時空改変ゲート', icon: '⏳', eraReq: 8, cost: { gold: 30000, stone: 20000, knowledge: 8000 }, popAdd: 200, desc: '過去と未来を繋ぐ禁断の門。' },
+      { id: 'divine_spire', name: '天界の尖塔', icon: '🗼', eraReq: 9, cost: { gold: 80000, stone: 50000, knowledge: 20000 }, popAdd: 350, desc: '神々の領域へと届く天上の尖塔。' },
+      { id: 'string_engine', name: '超弦炉心エンジン', icon: '🌌', eraReq: 11, cost: { gold: 300000, stone: 200000, knowledge: 80000 }, popAdd: 600, desc: '宇宙の基本振動を司る究極の炉心。' },
+      { id: 'singularity_core', name: '【無理ゲー要塞】特異点神殿', icon: '🌀', eraReq: 15, cost: { gold: 2000000, wood: 1000000, stone: 1500000, knowledge: 500000 }, popAdd: 1500, desc: '無理ゲー時代の果てにそびえ立つ全知全能の神殿。' }
     ];
 
     class SoundEngine {
@@ -549,7 +577,6 @@
       const dailyAvg = totalWeekMins / 7;
       const target = gameState.targetDailyMinutes || 30;
 
-      // ユーザーが設定した目標平均の7割未満の場合に襲来
       if (dailyAvg < target * 0.7) {
         triggerWeeklyRaid(Math.round(dailyAvg), target);
       }
@@ -600,7 +627,6 @@
       if (activeTimerMode === 'stopwatch') mins = Math.max(1, Math.floor(stopwatchSeconds / 60));
       if (activeTimerMode === 'pomodoro') mins = (pomoState === 'work') ? 25 : 0;
 
-      // 資源獲得量を適正なバランスに下方修正（1分あたり2〜3程度）
       const gold = Math.round(mins * 2);
       const wood = Math.round(mins * 2);
       const stone = Math.round(mins * 1.5);
@@ -813,108 +839,49 @@
             </div>
           </div>
           <div>
-            ${isCompleted 
+            ${isCompleted && !q.claimed
               ? `<button onclick="claimQuestReward('${q.id}', '${currentQuestTab}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg pixel-btn">🎁 受け取る</button>`
-              : `<button disabled class="bg-slate-800/80 text-slate-500 text-xs font-semibold px-4 py-2 rounded-xl">未達成</button>`
+              : q.claimed 
+                ? `<button disabled class="bg-slate-800/50 text-slate-500 text-xs font-semibold px-4 py-2 rounded-xl">受取済み</button>`
+                : `<button disabled class="bg-slate-800/80 text-slate-500 text-xs font-semibold px-4 py-2 rounded-xl">未達成</button>`
             }
           </div>
         `;
         container.appendChild(card);
       });
     }
-    
-      window.claimQuestReward = function(questId, type)
-      // ==========================================
-      // 1. 変数の初期化（一番上に配置して参照エラーを防止）
-      // ==========================================
-        const canvas = document.getElementById('kingdomCanvas')
-        const ctx = canvas ? canvas.getContext('2d') : null;
-    let selectedPlotBuilding = null;
 
-    // ==========================================
-    // 2. マップ描画関数
-    // ==========================================
-    function renderCanvasMap() {
-      if (!canvas) return;
-      const rect = canvas.parentElement.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-      // 以下、マップ描画の処理が続きます
-    }
-
-    // ==========================================
-    // 3. ミッション報酬受け取り関数（安全設計版）
-    // ==========================================
     window.claimQuestReward = function(questId, type) {
-      let q = null;
-      if (type === 'daily' || !type) {
-        q = gameState.dailyQuests.find(item => item.id === questId);
-      }
-      if (!q && (type === 'regular' || !type)) {
-        q = gameState.regularQuests.find(item => item.id === questId);
-      }
-  
-      if (!q || q.current < q.target) return;
+      const questList = (type === 'daily') ? gameState.dailyQuests : gameState.regularQuests;
+      const q = questList.find(item => item.id === questId);
+      if (!q || q.current < q.target || q.claimed) return;
 
-      if (q.claimed) {
-        showToast('⚠️ このミッションの報酬はすでに受け取り済みです！');
-        return;
-      }}
+      Object.entries(q.reward).forEach(([res, val]) => {
+        if (gameState.resources[res] !== undefined) gameState.resources[res] += val;
+      });
 
-  q.claimed = true;
+      q.claimed = true;
 
-  Object.entries(q.reward).forEach(([res, val]) => {
-    if (gameState.resources[res] !== undefined) gameState.resources[res] += val;
-  });
-
-  saveGameState();
-  renderQuests();
-  updateUI();
-  sound.playChime();
-  showToast('🎁 ミッションの報酬を受け取りました！');
-};
-
-// ==========================================
-// 4. 初期化・UI更新の呼び出し（一番最後に配置）
-// ==========================================
-// 例: ページの読み込み時やセットアップの最後に実行
-if (typeof updateUI === 'function') {
-  updateUI();
-}
-
-    q.claimed = true;
-
-    Object.entries(q.reward).forEach(([res, val]) => {
-      if (gameState.resources[res] !== undefined) gameState.resources[res] += val;
-    });
-
-    saveGameState();
-    renderQuests();
-    updateUI();
-    sound.playChime();
-    showToast('🎁 ミッションの報酬を受け取りました！');
-  };
-
-      saveGameState();
-      renderQuests(); // 画面のボタンを「受取済」に更新
-      updateUI();
-      sound.playChime();
-      showToast('🎁 ミッションの報酬を受け取りました！');
       sound.playChime();
       confetti({ particleCount: 50, spread: 50 });
 
       if (type === 'daily') {
-        q.claimed = true;
         showToast(`🎁 デイリーミッション報酬を受け取りました！`);
       } else {
         q.level++;
         q.target = Math.round(q.target * 1.8);
         Object.keys(q.reward).forEach(key => { q.reward[key] = Math.round(q.reward[key] * 1.6); });
         q.desc = `累計勉強時間を${q.target}分達成する`;
+        q.claimed = false;
         showToast(`🏆 レギュラーミッション Lv.${q.level} へ進化！`);
+      }
       saveGameState();
       updateUI();
     };
+
+    const canvas = document.getElementById('kingdomCanvas');
+    const ctx = canvas.getContext('2d');
+    let selectedPlotBuilding = null;
 
     function renderCanvasMap() {
       if (!canvas) return;
@@ -930,7 +897,7 @@ if (typeof updateUI === 'function') {
       const cols = Math.ceil(Math.sqrt(maxPlots));
       const rows = Math.ceil(maxPlots / cols);
 
-      const padding = 20;
+      const padding = 15;
       const cellW = (canvas.width - padding * 2) / cols;
       const cellH = (canvas.height - padding * 2) / rows;
 
@@ -944,7 +911,7 @@ if (typeof updateUI === 'function') {
         ctx.strokeStyle = '#334155';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.roundRect(x + 4, y + 4, cellW - 8, cellH - 8, 8);
+        ctx.roundRect(x + 2, y + 2, cellW - 4, cellH - 4, 4);
         ctx.fill();
         ctx.stroke();
 
@@ -952,7 +919,7 @@ if (typeof updateUI === 'function') {
         if (bldg) {
           const type = BUILDING_TYPES.find(t => t.id === bldg.typeId);
           if (type) {
-            ctx.font = `${Math.min(cellW, cellH) * 0.4}px sans-serif`;
+            ctx.font = `${Math.min(cellW, cellH) * 0.45}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(type.icon, x + cellW / 2, y + cellH / 2);
@@ -961,7 +928,35 @@ if (typeof updateUI === 'function') {
       }
     }
 
+    function renderSubjectSummary() {
+      const container = document.getElementById('subjectSummaryCards');
+      if (!container) return;
+      const subjects = gameState.subjects || DEFAULT_SUBJECTS;
+      const sm = gameState.subjectMinutes || {};
+
+      let html = `
+        <div class="bg-slate-800/80 p-3.5 rounded-xl border border-slate-700">
+          <p class="text-slate-400 text-xs">総学習時間</p>
+          <p class="text-xl font-bold font-mono text-amber-400 mt-1">${gameState.totalStudyMinutes}分</p>
+        </div>
+      `;
+
+      subjects.forEach(s => {
+        const mins = sm[s.id] || 0;
+        html += `
+          <div class="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/50">
+            <p class="text-slate-400 text-xs truncate">${s.name}</p>
+            <p class="text-lg font-bold font-mono text-indigo-300 mt-1">${mins}分</p>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
     function renderCharts() {
+      renderSubjectSummary();
+
       const dailyCtx = document.getElementById('statsDailyChart');
       if (dailyCtx) {
         const dates = Object.keys(gameState.dailyTrend || {}).sort().slice(-7);
@@ -1021,7 +1016,7 @@ if (typeof updateUI === 'function') {
             labels: subjLabels,
             datasets: [{
               data: subjValues,
-              backgroundColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6', '#f43f5e'],
+              backgroundColor: ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#14b8a6', '#f43f5e', '#a855f7'],
               borderWidth: 0
             }]
           },
@@ -1115,6 +1110,13 @@ if (typeof updateUI === 'function') {
         const unlocked = gameState.eraIndex >= b.eraReq;
         const card = document.createElement('div');
         card.className = `bg-slate-900 border rounded-2xl p-4 flex flex-col justify-between ${unlocked ? 'border-slate-800' : 'border-slate-800/40 opacity-50'}`;
+        
+        let costStr = '';
+        if (b.cost.gold) costStr += `🪙${b.cost.gold} `;
+        if (b.cost.wood) costStr += `🪵${b.cost.wood} `;
+        if (b.cost.stone) costStr += `🪨${b.cost.stone} `;
+        if (b.cost.knowledge) costStr += `📚${b.cost.knowledge} `;
+
         card.innerHTML = `
           <div>
             <div class="flex items-center justify-between mb-2">
@@ -1125,7 +1127,7 @@ if (typeof updateUI === 'function') {
             <p class="text-xs text-slate-400 mt-1">${b.desc}</p>
           </div>
           <div class="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center">
-            <span class="text-xs font-mono text-amber-400">🪙${b.cost.gold || 0} 🪵${b.cost.wood || 0}</span>
+            <span class="text-[11px] font-mono text-amber-400">${costStr}</span>
             <button class="btn-buy px-3 py-1.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white" data-id="${b.id}" ${!unlocked ? 'disabled' : ''}>建築</button>
           </div>
         `;
@@ -1148,13 +1150,21 @@ if (typeof updateUI === 'function') {
         showToast('⚠️ 領地がいっぱいです！次の時代へ進化させてください。');
         return;
       }
-      if (gameState.resources.gold < (bldg.cost.gold || 0) || gameState.resources.wood < (bldg.cost.wood || 0)) {
+      
+      const cost = bldg.cost;
+      if (gameState.resources.gold < (cost.gold || 0) || 
+          gameState.resources.wood < (cost.wood || 0) || 
+          gameState.resources.stone < (cost.stone || 0) || 
+          gameState.resources.knowledge < (cost.knowledge || 0)) {
         showToast('⚠️ 資材が不足しています！');
         return;
       }
 
-      gameState.resources.gold -= (bldg.cost.gold || 0);
-      gameState.resources.wood -= (bldg.cost.wood || 0);
+      gameState.resources.gold -= (cost.gold || 0);
+      gameState.resources.wood -= (cost.wood || 0);
+      gameState.resources.stone -= (cost.stone || 0);
+      gameState.resources.knowledge -= (cost.knowledge || 0);
+
       if (bldg.popAdd) gameState.resources.pop += bldg.popAdd;
 
       gameState.buildings.push({
@@ -1224,7 +1234,6 @@ if (typeof updateUI === 'function') {
       updateQuestProgress();
       updateUI();
 
-      // Navigation Tabs
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const tabId = e.currentTarget.getAttribute('data-tab');
@@ -1242,7 +1251,6 @@ if (typeof updateUI === 'function') {
         });
       });
 
-      // Quest Sub-Tabs
       document.getElementById('btnSubTabDaily').addEventListener('click', () => {
         currentQuestTab = 'daily';
         document.getElementById('btnSubTabDaily').className = 'quest-subtab active bg-indigo-600 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition flex items-center gap-1.5';
@@ -1259,7 +1267,6 @@ if (typeof updateUI === 'function') {
         renderQuests();
       });
 
-      // Timer Mode Switchers
       document.querySelectorAll('.mode-select-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           activeTimerMode = e.currentTarget.getAttribute('data-timer-mode');
@@ -1274,7 +1281,6 @@ if (typeof updateUI === 'function') {
         });
       });
 
-      // Fine Controls
       const customInput = document.getElementById('inputCustomMinutes');
       const setCustomMinutes = (val) => {
         customTargetMinutes = Math.max(1, Math.min(300, val));
@@ -1289,7 +1295,6 @@ if (typeof updateUI === 'function') {
       document.getElementById('btnTimeAdd10').addEventListener('click', () => setCustomMinutes(customTargetMinutes + 10));
       customInput.addEventListener('change', (e) => setCustomMinutes(parseInt(e.target.value) || 25));
 
-      // Timer Buttons
       document.getElementById('btnStartPause').addEventListener('click', () => {
         if (isRunning) pauseTimer(); else startTimer();
       });
@@ -1311,7 +1316,6 @@ if (typeof updateUI === 'function') {
         document.getElementById('modalRaidEvent').classList.add('hidden');
       });
 
-      // 1日平均目標の保存ボタン
       document.getElementById('btnSaveTargetMinutes').addEventListener('click', () => {
         const val = parseInt(document.getElementById('inputTargetDailyMinutes').value);
         if (val && val > 0) {
@@ -1323,7 +1327,6 @@ if (typeof updateUI === 'function') {
         }
       });
 
-      // 科目追加ボタン
       document.getElementById('btnAddSubject').addEventListener('click', () => {
         const input = document.getElementById('inputNewSubjectName');
         const name = input.value.trim();
@@ -1357,7 +1360,7 @@ if (typeof updateUI === 'function') {
         const era = ERAS[gameState.eraIndex];
         const cols = Math.ceil(Math.sqrt(era.maxPlots));
         const rows = Math.ceil(era.maxPlots / cols);
-        const padding = 20;
+        const padding = 15;
         const cellW = (canvas.width - padding * 2) / cols;
         const cellH = (canvas.height - padding * 2) / rows;
 
